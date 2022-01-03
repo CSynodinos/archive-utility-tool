@@ -58,12 +58,12 @@ class archive:
             """
 
             if isinstance(self.flinp, type(None)): 
-                print("Extracting all files: %d%%" %((self.tell()*100)/self._total_size), end = "\r") # tell() returns the current position of the object. Allows for tracking
+                print("Extracting all files: %d%%" %((self.tell()*100) / self._total_size), end = "\r") # tell() returns the current position of the object. Allows for tracking
                                                                                                         # the extraction progress.
             elif isinstance(self.flinp, str):   # When single file is chosen.
-                print("Extracting %s: %d%%" %(self.flinp, ((self.tell()*100)/self._total_size)), end = "\r")
+                print("Extracting %s: %d%%" %(self.flinp, ((self.tell()*100) / self._total_size)), end = "\r")
             else:
-                print("Extracting %d files: %d%%" %(len(self.flinp), ((self.tell()*100)/self._total_size)), end = "\r")
+                print("Extracting %d files: %d%%" %(len(self.flinp), ((self.tell()*100) / self._total_size)), end = "\r")
             return io.FileIO.read(self, size)
 
     @staticmethod
