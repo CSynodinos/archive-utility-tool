@@ -1,0 +1,16 @@
+# files
+*.pyc
+*.txt
+.vscode/
+.__pycache__/
+tests/__pycache__/
+*.docx
+*.txt
+*.tar
+*.rar
+*.zip
+
+# package files
+build/
+dist/
+*egg-info/
