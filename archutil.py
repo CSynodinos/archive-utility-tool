@@ -152,5 +152,5 @@ class archive:
         pass
 
 if __name__ == "__main__":
-    x = archive(__inp__ = r"E:\Documents\Python_Scripts\archive utility tool\Documents.tar", fl = ['test.txt', 'bed.docx', 'Presentation TOK.docx', 'yomama'], dest = r"E:\Documents\Python_Scripts\archive utility tool\output")
+    x = archive(__inp__ = r"E:\Documents\Python_Scripts\archive utility tool\Documents.tar", fl = ['test.txt', 'bed.docx', 'Presentation TOK.docx'], dest = r"E:\Documents\Python_Scripts\archive utility tool\output")
     x.decompress()
