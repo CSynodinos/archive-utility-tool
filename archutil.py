@@ -4,6 +4,7 @@ import zipfile
 import tarfile
 import rarfile
 import errno
+from tqdm import tqdm
 
 def custom_warning(msg, *args, **kwargs):
     """Custom warning message. Hides source code.
@@ -17,8 +18,6 @@ def custom_warning(msg, *args, **kwargs):
     return 'Warning: ' + str(msg) + '\n'
 import warnings
 warnings.formatwarning = custom_warning
-
-from tqdm import tqdm
 
 
 def _format_check(*args, fmtype):
