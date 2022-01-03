@@ -67,11 +67,6 @@ class archive:
             return io.FileIO.read(self, size)
 
     @staticmethod
-    def custom_formatwarning(msg, *args, **kwargs):
-    # ignore everything except the message
-        return str(msg) + '\n'
-
-    @staticmethod
     def chk_opt(inparc, inpfl, gnames):   # check if selected files exist in the archive.
         
         if not [x for x in gnames if x in inpfl]:
