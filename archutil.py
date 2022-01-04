@@ -40,14 +40,16 @@ class archive:
         if not Path(__inp__).exists():
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), __inp__)
         if not os.path.isfile(__inp__):
-            raise ValueError('__inp__ must be a path to a file.')
+            raise ValueError('__inp__ must be a path to an existing file.')
 
         self.display = display
         if not isinstance(display, bool):
-            raise ValueError('display must be of type: Boolean.')
+            raise ValueError(f'display must be of type: Boolean. not of type: {type(display).__name__}')
 
         self.fl = fl
         self.dest = dest
+        if not os.path.isdir(dest):
+            raise ValueError('dest must be a path to a directory.')
 
     class _FileObject(io.FileIO):
         """Internal class for creating an IO object to check extraction progression for tarfile."""
