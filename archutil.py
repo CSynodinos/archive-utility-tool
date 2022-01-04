@@ -37,15 +37,14 @@ def _format_check(*args, fmtype):   ## Not currently used.
 class archive:
     def __init__(self, __inp__, display = True, fl = None, dest = os.getcwd()):
         self.__inp__ = __inp__
-        if not Path(self.__inp__).exists():
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), self.__inp__)
+        if not Path(__inp__).exists():
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), __inp__)
+        if not os.path.isfile(__inp__):
+            raise ValueError('__inp__ must be a path to a file.')
 
         self.display = display
         if not isinstance(display, bool):
             raise ValueError('display must be of type: Boolean.')
-
-        if not os.path.isfile(__inp__):
-            raise ValueError('__inp__ must be a path to a file.')
 
         self.fl = fl
         self.dest = dest
