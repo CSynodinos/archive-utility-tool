@@ -129,8 +129,10 @@ class archive:
                     try:
                         zf.extract(member, path = self.dest)
                     except zipfile.error as e:
+                        ## Needs fixing
                         pass
-
+        
+        ## Needs fixing
         elif self.__inp__.endswith(".rar"):    # Checks if compression is .rar
             rar = rarfile.open(fileobj = archive._FileObject(self.__inp__, displ= self.display))    # rarfile.open opens the file contained in the FileObject class.
             
