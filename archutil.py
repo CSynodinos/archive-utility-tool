@@ -4,6 +4,7 @@ import zipfile
 import tarfile
 import rarfile
 import errno
+from pathlib import Path
 from tqdm import tqdm
 
 def custom_warning(msg, *args, **kwargs):
@@ -36,6 +37,8 @@ def _format_check(*args, fmtype):
 class archive:
     def __init__(self, __inp__, display = True, fl = None, dest = os.getcwd()):
         self.__inp__ = __inp__
+        if not Path(self.__inp__).exists():
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), self.__inp__)
 
         self.display = display
         if not isinstance(display, bool):
