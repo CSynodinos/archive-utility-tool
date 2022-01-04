@@ -60,24 +60,37 @@ class archive:
             if isinstance(self.flinp, type(None)): 
                 print("Extracting all files: %d%%" %((self.tell()*100) / self._total_size), end = "\r") # tell() returns the current position of the object. Allows for tracking
                                                                                                         # the extraction progress.
-            elif isinstance(self.flinp, str):   # When single file is chosen.
+            elif isinstance(self.flinp, str):   # When single file is chosen or when list of strings is being iterated.
                 print("Extracting %s: %d%%" %(self.flinp, ((self.tell()*100) / self._total_size)), end = "\r")
-            else:
+            elif isinstance(self.flinp, list):
                 print("Extracting %d files: %d%%" %(len(self.flinp), ((self.tell()*100) / self._total_size)), end = "\r")
             return io.FileIO.read(self, size)
 
     @staticmethod
     def chk_opt(inparc, inpfl, gnames):   # check if selected files exist in the archive.
-        
-        if not [x for x in gnames if x in inpfl]:
-            raise KeyError(f'None of the {len(inpfl)} requested files for extraction found in the {(inparc)} archive. Extraction failed.')
+        """Check if selected files for extraction exist in the archive.
+
+        Args:
+            * `inparc` ([type]: `str`): Path to archive for extraction.
+            * `inpfl` ([type]: `list`): List of files to extract.
+            * `gnames` ([type]: `list`): List of all files in the archive.
+
+        Raises:
+            * `KeyError`: Raised when none of the selected files are present in the archive.
+            * `Warning`: When one or more of the selected files are not present in the archive. 
+
+        Returns:
+            [type]: `list`: The list of the selected files that are present in the archive.  
+        """
+
+        if not [x for x in gnames if x in inpfl]:   # None of the selected files are present in the archive.
+            raise KeyError(f'None of the {len(inpfl)} requested files for extraction found in the {(inparc).__name__} archive. Extraction failed.')
         incorrect_opt = list(set(inpfl) - set(gnames))
 
-        if len(incorrect_opt) >= 1:
+        if len(incorrect_opt) >= 1: # Not possible to be 0 because KeyError would have initiated.
             for i in incorrect_opt:
                 warnings.warn(f"Selected file {i} could not be found. File {i} will be ignored.", stacklevel = 0)
-                if i in inpfl:
-                    inpfl.remove(i)
+                inpfl.remove(i)
             return list(inpfl)
         else:
             return list(inpfl)
@@ -126,17 +139,13 @@ class archive:
                     tarcheck = tarfile.open(self.__inp__)   # Temporarily open the file to get the names of the members and check if any of the requested files exist.
                     compfiles = tarcheck.getnames()
                     tarcheck.close()
-
                     fls = self.chk_opt(inparc = self.__inp__, inpfl = self.fl, gnames = compfiles)
 
                     tar = tarfile.open(fileobj = archive._FileObject(self.__inp__, flinp = self.fl))
                     for i in fls:   # Iterate the appended elements.
-                        try:
-                            if [n for n in compfiles if n in fls]:  # decompress only if the iterable is an element in the getnames() list.
-                                member = tar.getmember(name = i)
-                                tar.extract(member)
-                        except: # if iterable not in getnames(), continue to next iterable.
-                            continue
+                        member = tar.getmember(name = i)
+                        tar.extract(member)
+                    tar.close()
 
                 else:
                     raise TypeError('fl input parameter must be of type string if you wish to decompress one file, type list if you wish ' 
@@ -147,5 +156,5 @@ class archive:
         pass
 
 if __name__ == "__main__":
-    x = archive(__inp__ = r"E:\Documents\Python_Scripts\archive utility tool\Documents.tar", fl = ['test.txt', 'bed.docx', 'Presentation TOK.docx'], dest = r"E:\Documents\Python_Scripts\archive utility tool\output")
+    x = archive(__inp__ = r"E:\Documents\Python_Scripts\archive utility tool\Documents.tar", fl = ['test.txt', 'bed.docx'], dest = r"E:\Documents\Python_Scripts\archive utility tool\output")
     x.decompress()
