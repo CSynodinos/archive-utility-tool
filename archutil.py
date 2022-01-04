@@ -43,6 +43,8 @@ class archive:
         self.dest = dest
 
     class _FileObject(io.FileIO):
+        """Internal class for creating an IO object to check extraction progression for tarfile."""
+
         def __init__(self, path, flinp, *args, **kwargs):
             """Gets total size of file object."""
             
