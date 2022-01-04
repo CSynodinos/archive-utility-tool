@@ -19,7 +19,6 @@ def custom_warning(msg, *args, **kwargs):
 import warnings
 warnings.formatwarning = custom_warning
 
-
 def _format_check(*args, fmtype):
     """Checks for variable/s type. Helper to _typecheck.
     Args:
@@ -34,8 +33,13 @@ def _format_check(*args, fmtype):
             raise TypeError(f'{n} must be of type {fmtype.__name__} not a type {a}')
 
 class archive:
-    def __init__(self, __inp__, fl = None, dest = os.getcwd()):
+    def __init__(self, __inp__, display = True, fl = None, dest = os.getcwd()):
         self.__inp__ = __inp__
+
+        self.display = display
+        if not isinstance(display, bool):
+            raise ValueError('display must be of type: Boolean.')
+
         if not os.path.isfile(__inp__):
             raise ValueError('__inp__ must be a path to a file.')
 
@@ -45,9 +49,10 @@ class archive:
     class _FileObject(io.FileIO):
         """Internal class for creating an IO object to check extraction progression for tarfile."""
 
-        def __init__(self, path, flinp, *args, **kwargs):
+        def __init__(self, path, displ, flinp, *args, **kwargs):
             """Gets total size of file object."""
-            
+
+            self.displ = displ
             self._total_size = os.path.getsize(path)
             self.flinp = flinp
             io.FileIO.__init__(self, path, *args, **kwargs)
@@ -59,15 +64,19 @@ class archive:
                 [type]: `bytes`: ByteStream of file object.
             """
 
-            if isinstance(self.flinp, type(None)): 
-                print("Extracting all files: %d%%" %((self.tell()*100) / self._total_size), end = "\r") # tell() returns the current position of the object. Allows for tracking
-                                                                                                        # the extraction progress.
+            if self.displ == True:
+                if isinstance(self.flinp, type(None)): 
+                    print("Extracting all files: %d%%" %((self.tell()*100) / self._total_size), end = "\r") # tell() returns the current position of the object. Allows for tracking
+                                                                                                            # the extraction progress.
 
-            elif isinstance(self.flinp, str):   # When single file is chosen or when list of strings is being iterated.
-                print("Extracting %s: %d%%" %(self.flinp, ((self.tell()*100) / self._total_size)), end = "\r")
+                elif isinstance(self.flinp, str):   # When single file is chosen or when list of strings is being iterated.
+                    print("Extracting %s: %d%%" %(self.flinp, ((self.tell()*100) / self._total_size)), end = "\r")
 
-            elif isinstance(self.flinp, list):
-                print("Extracting %d files: %d%%" %(len(self.flinp), ((self.tell()*100) / self._total_size)), end = "\r")
+                elif isinstance(self.flinp, list):
+                    print("Extracting %d files: %d%%" %(len(self.flinp), ((self.tell()*100) / self._total_size)), end = "\r")
+
+            elif self.displ == False:
+                pass
 
             return io.FileIO.read(self, size)
 
@@ -118,7 +127,7 @@ class archive:
                         pass
 
         elif self.__inp__.endswith(".rar"):    # Checks if compression is .rar
-            rar = rarfile.open(fileobj = archive._FileObject(self.__inp__))    # rarfile.open opens the file contained in the FileObject class.
+            rar = rarfile.open(fileobj = archive._FileObject(self.__inp__, displ= self.display))    # rarfile.open opens the file contained in the FileObject class.
             
             rar.extractall(path = self.dest) # File is extracted in the self.dest subdirectory.
             
@@ -126,13 +135,13 @@ class archive:
 
         elif self.__inp__.endswith(tarexts):
             if isinstance(self.fl, type(None)): # No specific file is selected for extraction, extract whole archive.
-                tar = tarfile.open(fileobj = archive._FileObject(self.__inp__, flinp = self.fl))
+                tar = tarfile.open(fileobj = archive._FileObject(self.__inp__, displ= self.display, flinp = self.fl))
                 tar.extractall(path = self.dest)
                 tar.close()
 
             else:
                 if isinstance(self.fl, str): # Single file to decompress from archive.
-                    tar = tarfile.open(fileobj = archive._FileObject(self.__inp__, flinp = self.fl))
+                    tar = tarfile.open(fileobj = archive._FileObject(self.__inp__, displ= self.display, flinp = self.fl))
                     membername = tar.getnames()
                     if self.fl in membername:
                         member = tar.getmember(name = self.fl)
@@ -146,7 +155,7 @@ class archive:
                     tarcheck.close()
                     fls = self.chk_opt(inparc = self.__inp__, inpfl = self.fl, gnames = compfiles)
 
-                    tar = tarfile.open(fileobj = archive._FileObject(self.__inp__, flinp = self.fl))
+                    tar = tarfile.open(fileobj = archive._FileObject(self.__inp__, displ= self.display, flinp = self.fl))
                     for i in fls:   # Iterate the appended elements.
                         member = tar.getmember(name = i)
                         tar.extract(member)
