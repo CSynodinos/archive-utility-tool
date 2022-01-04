@@ -62,10 +62,13 @@ class archive:
             if isinstance(self.flinp, type(None)): 
                 print("Extracting all files: %d%%" %((self.tell()*100) / self._total_size), end = "\r") # tell() returns the current position of the object. Allows for tracking
                                                                                                         # the extraction progress.
+
             elif isinstance(self.flinp, str):   # When single file is chosen or when list of strings is being iterated.
                 print("Extracting %s: %d%%" %(self.flinp, ((self.tell()*100) / self._total_size)), end = "\r")
+
             elif isinstance(self.flinp, list):
                 print("Extracting %d files: %d%%" %(len(self.flinp), ((self.tell()*100) / self._total_size)), end = "\r")
+
             return io.FileIO.read(self, size)
 
     @staticmethod
