@@ -21,7 +21,7 @@ def custom_warning(msg, *args, **kwargs):
 import warnings
 warnings.formatwarning = custom_warning
 
-def _format_check(*args, fmtype):
+def _format_check(*args, fmtype):   # Not currently used.
     """Checks for variable/s type. Helper to _typecheck.
     Args:
         * `*args` ([type]: any): Input variable/s to check.
