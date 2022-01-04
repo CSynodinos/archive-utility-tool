@@ -16,6 +16,7 @@ def custom_warning(msg, *args, **kwargs):
         [type]: The warning message.
     """
     return 'Warning: ' + str(msg) + '\n'
+
 import warnings
 warnings.formatwarning = custom_warning
 
