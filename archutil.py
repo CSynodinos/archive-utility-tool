@@ -163,12 +163,12 @@ class archive:
 
                 else:
                     raise TypeError('fl input parameter must be of type string if you wish to decompress one file, type list if you wish ' 
-                                    + 'to decompress multiple selected files or None if you wish to decompress the entire archive, '
+                                    'to decompress multiple files or None if you wish to decompress the entire archive, '
                                     f'not of type {type(self.fl).__name__}.')
 
     def compress():
         pass
 
 if __name__ == "__main__":
-    x = archive(__inp__ = r"E:\Documents\Python_Scripts\archive utility tool\Documents.tar", fl = ['test.txt', 'bed.docx'], dest = r"E:\Documents\Python_Scripts\archive utility tool\output")
+    x = archive(__inp__ = r"E:\Documents\Python_Scripts\archive utility tool\Documents.tar", fl = ['test.txt', 'bed.docx'], display = True, dest = r"E:\Documents\Python_Scripts\archive utility tool\output")
     x.decompress()
