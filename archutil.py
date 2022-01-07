@@ -37,19 +37,9 @@ def _format_check(*args, fmtype):   ## Not currently used.
 class archive:
     def __init__(self, __inp__, display = True, fl = None, dest = os.getcwd()):
         self.__inp__ = __inp__
-        if not Path(__inp__).exists():
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), __inp__)
-        if not os.path.isfile(__inp__):
-            raise ValueError('__inp__ must be a path to an existing file.')
-
         self.display = display
-        if not isinstance(display, bool):
-            raise ValueError(f'display must be of type: Boolean. not of type: {type(display).__name__}')
-
         self.fl = fl
         self.dest = dest
-        if not os.path.isdir(dest):
-            raise ValueError('dest must be a path to a directory.')
 
     class _FileObject(io.FileIO):
         """Internal class for creating an IO object to check extraction progression for tarfile."""
@@ -86,8 +76,8 @@ class archive:
             return io.FileIO.read(self, size)
 
     @staticmethod
-    def chk_opt(inparc, inpfl, gnames):   # check if selected files exist in the archive.
-        """Check if selected files for extraction exist in the archive.
+    def chk_opt(inparc, inpfl, gnames):
+        """Check if selected files for extraction exist in the input archive.
 
         Args:
             * `inparc` ([type]: `str`): Path to archive for extraction.
@@ -113,12 +103,28 @@ class archive:
             return list(inpfl)
         else:
             return list(inpfl)
+    
+    def errorchk(self):
+        """Checks for class parameter erros."""
 
+        if not Path(self.__inp__).exists():
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), self.__inp__)
+        if not os.path.isfile(self.__inp__):
+            raise ValueError('__inp__ must be a path to an existing file.')
+
+        if not isinstance(self.display, bool):
+            raise ValueError(f'display must be of type: Boolean. not of type: {type(self.display).__name__}')
+
+        if not os.path.isdir(self.dest):
+            raise ValueError('dest must be a path to a directory.')
+    
     def decompress(self):
 
         supp_ext = (".zip", ".rar", ".tar.xz", ".tar.gz", ".tar.bz", ".tar")
         zipexts = (".zip")
         tarexts = (".tar.xz", ".tar.gz", ".tar.bz", ".tar")
+
+        errorchk()
 
         if not self.__inp__.endswith(supp_ext):
             raise OSError(f"Compression type: {os.path.splitext(self.__inp__)[1]} is currently not supported.")
@@ -157,7 +163,7 @@ class archive:
                         raise KeyError(f'The requested file {self.fl} was not found in the {(self.__inp__)} archive. Extraction failed.')
 
                 elif isinstance(self.fl, list):     # A list of files to decompress.
-                    tarcheck = tarfile.open(self.__inp__)   # Temporarily open the file to get the names of the members and check if any of the requested files exist.
+                    tarcheck = tarfile.open(self.__inp__)   # Temporarily open.
                     compfiles = tarcheck.getnames()
                     tarcheck.close()
                     fls = self.chk_opt(inparc = self.__inp__, inpfl = self.fl, gnames = compfiles)
