@@ -64,7 +64,7 @@ class archive:
                     print("Extracting all files: %d%%" %((self.tell()*100) / self._total_size), end = "\r") # tell() returns the current position of the object. Allows for tracking
                                                                                                             # the extraction progress.
 
-                elif isinstance(self.flinp, str):   # When single file is chosen or when list of strings is being iterated.
+                elif isinstance(self.flinp, str):   # When single file is chosen.
                     print("Extracting %s: %d%%" %(self.flinp, ((self.tell()*100) / self._total_size)), end = "\r")
 
                 elif isinstance(self.flinp, list):
@@ -146,7 +146,7 @@ class archive:
             
             rar.close() # File is closed.
 
-        elif self.__inp__.endswith(tarexts):
+                elif self.__inp__.endswith(tarexts):
             if isinstance(self.fl, type(None)): # No specific file is selected for extraction, extract whole archive.
                 tar = tarfile.open(fileobj = archive._FileObject(self.__inp__, displ= self.display, flinp = self.fl))
                 tar.extractall(path = self.dest)
@@ -163,17 +163,21 @@ class archive:
                         raise KeyError(f'The requested file {self.fl} was not found in the {(self.__inp__)} archive. Extraction failed.')
 
                 elif isinstance(self.fl, list):     # A list of files to decompress.
-                    tarcheck = tarfile.open(self.__inp__)   # Temporarily open.
-                    compfiles = tarcheck.getnames()
-                    tarcheck.close()
-                    fls = self.chk_opt(inparc = self.__inp__, inpfl = self.fl, gnames = compfiles)
-
                     tar = tarfile.open(fileobj = archive._FileObject(self.__inp__, displ= self.display, flinp = self.fl))
+                    compfiles = tar.getnames()
+                    fls = self.chk_opt(inparc = self.__inp__, inpfl = self.fl, gnames = compfiles)
                     for i in fls:   # Iterate the appended elements.
                         member = tar.getmember(name = i)
                         tar.extract(member)
                     tar.close()
 
+                else:
+                    raise TypeError('fl input parameter must be of type string if you wish to decompress one file, type list if you wish ' 
+                                    'to decompress multiple files or None if you wish to decompress the entire archive, '
+                                    f'not of type {type(self.fl).__name__}.')
+
+    def compress():
+        pass
                 else:
                     raise TypeError('fl input parameter must be of type string if you wish to decompress one file, type list if you wish ' 
                                     'to decompress multiple files or None if you wish to decompress the entire archive, '
