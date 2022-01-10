@@ -37,19 +37,9 @@ def _format_check(*args, fmtype):   ## Not currently used.
 class archive:
     def __init__(self, __inp__, display = True, fl = None, dest = os.getcwd()):
         self.__inp__ = __inp__
-        if not Path(__inp__).exists():
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), __inp__)
-        if not os.path.isfile(__inp__):
-            raise ValueError('__inp__ must be a path to an existing file.')
-
         self.display = display
-        if not isinstance(display, bool):
-            raise ValueError(f'display must be of type: Boolean. not of type: {type(display).__name__}')
-
         self.fl = fl
         self.dest = dest
-        if not os.path.isdir(dest):
-            raise ValueError('dest must be a path to a directory.')
 
     class _FileObject(io.FileIO):
         """Internal class for creating an IO object to check extraction progression for tarfile."""
@@ -74,7 +64,7 @@ class archive:
                     print("Extracting all files: %d%%" %((self.tell()*100) / self._total_size), end = "\r") # tell() returns the current position of the object. Allows for tracking
                                                                                                             # the extraction progress.
 
-                elif isinstance(self.flinp, str):   # When single file is chosen or when list of strings is being iterated.
+                elif isinstance(self.flinp, str):   # When single file is chosen.
                     print("Extracting %s: %d%%" %(self.flinp, ((self.tell()*100) / self._total_size)), end = "\r")
 
                 elif isinstance(self.flinp, list):
@@ -86,8 +76,8 @@ class archive:
             return io.FileIO.read(self, size)
 
     @staticmethod
-    def chk_opt(inparc, inpfl, gnames):   # check if selected files exist in the archive.
-        """Check if selected files for extraction exist in the archive.
+    def chk_opt(inparc, inpfl, gnames):
+        """Check if selected files for extraction exist in the input archive.
 
         Args:
             * `inparc` ([type]: `str`): Path to archive for extraction.
@@ -113,12 +103,28 @@ class archive:
             return list(inpfl)
         else:
             return list(inpfl)
+    
+    def errorchk(self):
+        """Checks for class parameter erros."""
 
+        if not Path(self.__inp__).exists():
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), self.__inp__)
+        if not os.path.isfile(self.__inp__):
+            raise ValueError('__inp__ must be a path to an existing file.')
+
+        if not isinstance(self.display, bool):
+            raise ValueError(f'display must be of type: Boolean. not of type: {type(self.display).__name__}')
+
+        if not os.path.isdir(self.dest):
+            raise ValueError('dest must be a path to a directory.')
+    
     def decompress(self):
 
         supp_ext = (".zip", ".rar", ".tar.xz", ".tar.gz", ".tar.bz", ".tar")
         zipexts = (".zip")
         tarexts = (".tar.xz", ".tar.gz", ".tar.bz", ".tar")
+
+        errorchk()
 
         if not self.__inp__.endswith(supp_ext):
             raise OSError(f"Compression type: {os.path.splitext(self.__inp__)[1]} is currently not supported.")
@@ -140,7 +146,7 @@ class archive:
             
             rar.close() # File is closed.
 
-        elif self.__inp__.endswith(tarexts):
+                elif self.__inp__.endswith(tarexts):
             if isinstance(self.fl, type(None)): # No specific file is selected for extraction, extract whole archive.
                 tar = tarfile.open(fileobj = archive._FileObject(self.__inp__, displ= self.display, flinp = self.fl))
                 tar.extractall(path = self.dest)
@@ -157,17 +163,21 @@ class archive:
                         raise KeyError(f'The requested file {self.fl} was not found in the {(self.__inp__)} archive. Extraction failed.')
 
                 elif isinstance(self.fl, list):     # A list of files to decompress.
-                    tarcheck = tarfile.open(self.__inp__)   # Temporarily open the file to get the names of the members and check if any of the requested files exist.
-                    compfiles = tarcheck.getnames()
-                    tarcheck.close()
-                    fls = self.chk_opt(inparc = self.__inp__, inpfl = self.fl, gnames = compfiles)
-
                     tar = tarfile.open(fileobj = archive._FileObject(self.__inp__, displ= self.display, flinp = self.fl))
+                    compfiles = tar.getnames()
+                    fls = self.chk_opt(inparc = self.__inp__, inpfl = self.fl, gnames = compfiles)
                     for i in fls:   # Iterate the appended elements.
                         member = tar.getmember(name = i)
                         tar.extract(member)
                     tar.close()
 
+                else:
+                    raise TypeError('fl input parameter must be of type string if you wish to decompress one file, type list if you wish ' 
+                                    'to decompress multiple files or None if you wish to decompress the entire archive, '
+                                    f'not of type {type(self.fl).__name__}.')
+
+    def compress():
+        pass
                 else:
                     raise TypeError('fl input parameter must be of type string if you wish to decompress one file, type list if you wish ' 
                                     'to decompress multiple files or None if you wish to decompress the entire archive, '
