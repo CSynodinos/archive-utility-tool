@@ -124,7 +124,7 @@ class archive:
         zipexts = (".zip")
         tarexts = (".tar.xz", ".tar.gz", ".tar.bz", ".tar")
 
-        errorchk()
+        self.errorchk()
 
         if not self.__inp__.endswith(supp_ext):
             raise OSError(f"Compression type: {os.path.splitext(self.__inp__)[1]} is currently not supported.")
@@ -146,7 +146,7 @@ class archive:
             
             rar.close() # File is closed.
 
-                elif self.__inp__.endswith(tarexts):
+        elif self.__inp__.endswith(tarexts):
             if isinstance(self.fl, type(None)): # No specific file is selected for extraction, extract whole archive.
                 tar = tarfile.open(fileobj = archive._FileObject(self.__inp__, displ= self.display, flinp = self.fl))
                 tar.extractall(path = self.dest)
@@ -178,13 +178,7 @@ class archive:
 
     def compress():
         pass
-                else:
-                    raise TypeError('fl input parameter must be of type string if you wish to decompress one file, type list if you wish ' 
-                                    'to decompress multiple files or None if you wish to decompress the entire archive, '
-                                    f'not of type {type(self.fl).__name__}.')
 
-    def compress():
-        pass
 
 if __name__ == "__main__":
     x = archive(__inp__ = r"E:\Documents\Python_Scripts\archive utility tool\Documents.tar", fl = ['test.txt', 'bed.docx'], display = True, dest = r"E:\Documents\Python_Scripts\archive utility tool\output")
