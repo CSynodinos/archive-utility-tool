@@ -1,9 +1,7 @@
-import io
-import os
-import zipfile
-import tarfile
-import rarfile
-import errno
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import io, os, zipfile, tarfile, rarfile, errno, warnings
 from pathlib import Path
 from tqdm import tqdm
 
@@ -18,7 +16,6 @@ def custom_warning(msg, *args, **kwargs):
     """
     return 'Warning: ' + str(msg) + '\n'
 
-import warnings
 warnings.formatwarning = custom_warning
 
 def _format_check(*args, fmtype):   ## Not currently used.
@@ -35,7 +32,7 @@ def _format_check(*args, fmtype):   ## Not currently used.
             raise TypeError(f'{n} must be of type {fmtype.__name__} not a type {a}')
 
 class archive:
-    def __init__(self, __inp__, display = True, fl = None, dest = os.getcwd()):
+    def __init__(self, __inp__: str, display = True, fl = None, dest = os.getcwd()) -> None:
         self.__inp__ = __inp__
         self.display = display
         self.fl = fl
@@ -44,7 +41,7 @@ class archive:
     class _FileObject(io.FileIO):
         """Internal class for creating an IO object to check extraction progression for tarfile."""
 
-        def __init__(self, path, displ, flinp, *args, **kwargs):
+        def __init__(self, path: str, displ, flinp: str, *args, **kwargs) -> None:
             """Gets total size of file object."""
 
             self.displ = displ
@@ -52,7 +49,7 @@ class archive:
             self.flinp = flinp
             io.FileIO.__init__(self, path, *args, **kwargs)
 
-        def read(self, size):
+        def read(self, size) -> bytes:
             """Reads the current position of the object and prints to stdout if `display` = True.
 
             Returns:
@@ -76,7 +73,7 @@ class archive:
             return io.FileIO.read(self, size)
 
     @staticmethod
-    def chk_opt(inparc, inpfl, gnames):
+    def chk_opt(inparc: str, inpfl: list, gnames: list) -> list:
         """Check if selected files for extraction exist in the input archive.
 
         Args:
